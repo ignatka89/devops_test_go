@@ -1,0 +1,5 @@
+appName: go-app
+
+image:
+  name: ignatka89/docker-go-test-app
+  tag: v1

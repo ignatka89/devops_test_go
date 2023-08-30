@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+  labels:
+    app: {{ .Values.appName }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "9100"
+        prometheus.io/scrape: "true"
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+      - image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+        name: {{ .Values.appName }}
+        imagePullPolicy: IfNotPresent 
+        #StartupProbe:
+         # httpGet:
+         #   path: /
+         #   port: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          periodSeconds: 5
+        ports:
+          - containerPort: 8080
+          - containerPort: 9100
+        env:
+          - name: REDIS_ADDR
+            value: redis-app-svc
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+            
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - image: redis:6.2-alpine
+        name: redis
+        command: ["/bin/sh"]
+        args: ["-c", "redis-server --save 5 1 --loglevel warning"]
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - -c
+            - redis-cli KEYS '*'
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - "/bin/sh"
+            - -c
+            - redis-cli KEYS '*'
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+          - containerPort: 6379
+      - name: redis-exporter
+        image: oliver006/redis_exporter
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_ADDR
+          value: "redis:6379"
+        ports:
+        - containerPort: 9121

@@ -1,0 +1,2 @@
+## use for find the endpoint answer
+curl --resolve "go-app-svc.info:80:$( minikube ip )" -i http://go-app-svc.info
