@@ -93,6 +93,7 @@ kubectl get gs xonotic -o jsonpath='{.status.address}:{.status.ports[0].port}'
 ```
 
 **notes:**
+You can find solution screenshots in server_xonotic folder.
 Next step is connect from the client , to do that next time need choose another linux machine with additional resources (for client) connect from outside is problematic if you run minikube on virtual machine on Virtualbox, port forwarding in this case doesn't work properly.
 
 Also we have possibility to add fleet and fleet autoscaller just use the command kubectl create files located in the solution/k8s/server_xonotic/xonotic/ folder.
