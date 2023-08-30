@@ -28,7 +28,8 @@ sudo docker run -d -p 7788:8080 -p 7777:9100 ignatka89/docker-go-test-app:v1
 cd compose/
 docker-compose up -d
 ```
-### Deploy cluster to minikube
+
+### Deploy cluster to minikube ( switch to CentOS Linux 7 as minikube required 2 Cores) 
 ```bash
 cd k8s
 helm install go-app-release go-app --values go-app/values.yaml
